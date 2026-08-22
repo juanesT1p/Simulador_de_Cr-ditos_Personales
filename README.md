@@ -47,3 +47,19 @@ Las pruebas unitarias validan la cuota calculada para un caso conocido y la cons
 Se creó `SimulationRepository`, una interfaz de Spring Data JPA encargada del acceso a las simulaciones almacenadas. Además de las operaciones estándar de `JpaRepository`, soporta filtros opcionales de histórico por coincidencia parcial del nombre del cliente, sin distinguir mayúsculas y minúsculas, y por rango de fechas de creación.
 
 Se creó `SimulationService` como capa de negocio para orquestar la creación de simulaciones. El servicio usa `AmortizationService` para obtener los valores financieros, los asigna a la entidad `Simulation`, los guarda mediante el repositorio y devuelve los datos con `SimulationResponseDTO`. También obtiene y mapea el histórico completo, ordenado por fecha de creación descendente, y los resultados de los filtros disponibles.
+
+### Fase 6: controller REST de simulaciones
+
+Se creó `SimulationController` para exponer las operaciones del simulador mediante la ruta base `/api/simulations`. El endpoint `POST /api/simulations` recibe una solicitud de simulación validada, delega su creación al servicio y devuelve `201 Created` con la simulación registrada.
+
+El endpoint `GET /api/simulations` devuelve el histórico de simulaciones con `200 OK`. Acepta opcionalmente `clientName` para buscar coincidencias parciales de nombre sin distinguir mayúsculas y minúsculas, o `startDate` y `endDate` para filtrar por rango de fechas. Cuando se envían ambos tipos de filtro, se prioriza `clientName`.
+
+### Problemas resueltos durante el desarrollo
+
+Durante las Fases 5 y 6 se presentó el error de compilación `package com.entidad.simulador.entity does not exist`. La causa fue que el archivo `entity/Simulation.java`, creado en la Fase 2, no se había agregado al repositorio, aunque los DTOs y los servicios que lo referencian tenían las importaciones correctas. Se creó manualmente el archivo faltante en `backend/src/main/java/com/entidad/simulador/entity/Simulation.java` y la compilación se ejecutó nuevamente con éxito.
+
+Al iniciar la aplicación con `mvn spring-boot:run` se presentó el error `FATAL: no existe la base de datos "simulador_creditos"`. La causa fue que la base de datos indicada en `spring.datasource.url` de `application.yml` no había sido creada en la instancia local de PostgreSQL. Se creó manualmente mediante el comando `sudo -u postgres psql -c "CREATE DATABASE simulador_creditos;"`. Después de crearla, Hibernate generó automáticamente la tabla `simulations` al iniciar la aplicación, conforme a la configuración `ddl-auto: update`.
+
+Tras resolver ambas incidencias, se verificó manualmente el funcionamiento de los endpoints REST de la Fase 6. `POST /api/simulations` creó simulaciones y devolvió `201 Created` con los valores calculados `monthlyPayment`, `totalInterest` y `totalPayment`. `GET /api/simulations` devolvió `200 OK` con las simulaciones guardadas y `GET /api/simulations?clientName=...` filtró correctamente por nombre de cliente. La persistencia se confirmó consultando directamente la tabla `simulations` en PostgreSQL con `psql`.
+
+Como nota pendiente, las solicitudes con datos inválidos, como un `loanAmount` negativo o un `clientName` vacío, actualmente devuelven un error `500` sin formato estructurado. Esta respuesta se resolverá en la Fase 7 mediante el manejo centralizado de excepciones con `@ControllerAdvice`.
