@@ -41,3 +41,9 @@ Se creó `AmortizationService` para calcular planes de pago de créditos persona
 La tasa efectiva anual recibida como porcentaje se convierte a la tasa mensual periódica equivalente con la fórmula `i_mensual = (1 + EA / 100)^(1 / 12) - 1`. Esta conversión conserva el interés compuesto y no divide la tasa anual de forma simple entre doce.
 
 Las pruebas unitarias validan la cuota calculada para un caso conocido y la consistencia matemática del plan de pagos: los abonos a capital suman el monto solicitado, el saldo final es cero y el total de intereses coincide con la suma de intereses de las cuotas.
+
+### Fase 5: persistencia y servicio de simulaciones
+
+Se creó `SimulationRepository`, una interfaz de Spring Data JPA encargada del acceso a las simulaciones almacenadas. Además de las operaciones estándar de `JpaRepository`, soporta filtros opcionales de histórico por coincidencia parcial del nombre del cliente, sin distinguir mayúsculas y minúsculas, y por rango de fechas de creación.
+
+Se creó `SimulationService` como capa de negocio para orquestar la creación de simulaciones. El servicio usa `AmortizationService` para obtener los valores financieros, los asigna a la entidad `Simulation`, los guarda mediante el repositorio y devuelve los datos con `SimulationResponseDTO`. También obtiene y mapea el histórico completo, ordenado por fecha de creación descendente, y los resultados de los filtros disponibles.
