@@ -30,4 +30,19 @@ public class SimulationRequestDTO {
     @NotNull
     @Min(1)
     private Integer termMonths;
+
+    // Se reciben por compatibilidad del contrato; el backend recalcula estos valores como fuente de verdad.
+    private BigDecimal monthlyPayment;
+
+    private BigDecimal totalInterest;
+
+    private BigDecimal totalPayment;
+
+    public SimulationRequestDTO(
+            String clientName, BigDecimal loanAmount, BigDecimal interestRate, Integer termMonths) {
+        this.clientName = clientName;
+        this.loanAmount = loanAmount;
+        this.interestRate = interestRate;
+        this.termMonths = termMonths;
+    }
 }
