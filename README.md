@@ -91,3 +91,19 @@ Se crearon las interfaces TypeScript `SimulationRequest`, `Simulation` y `Valida
 Se creó `SimulationService` en `frontend/src/app/core/services` para centralizar el consumo HTTP de simulaciones. El servicio expone `createSimulation`, que corresponde a `POST /api/simulations`; `getAllSimulations`, que corresponde a `GET /api/simulations`; `searchByClientName`, que envía el parámetro `clientName`; y `searchByDateRange`, que envía los parámetros `startDate` y `endDate` al endpoint de consulta.
 
 La configuración standalone de Angular registra `provideHttpClient()` en `app.config.ts` para habilitar `HttpClient` en los servicios de la aplicación. La URL base de la API se mantiene en el servicio y queda preparada para trasladarse a una configuración de entornos cuando el proyecto la incorpore.
+
+### Fase 11: formulario de simulación y cálculo local
+
+Se creó el componente standalone `SimulationFormComponent` en la estructura `frontend/src/app/features/simulation-form`. El formulario utiliza Reactive Forms y Angular Material para capturar el nombre del cliente, el monto del crédito, la tasa efectiva anual y el plazo en meses.
+
+Los cuatro campos son obligatorios. El monto y el plazo deben ser mayores o iguales a uno, y la tasa efectiva anual debe ser mayor o igual a 0,01. Los mensajes de validación se muestran cuando el usuario ha interactuado con el campo o intenta calcular con información inválida.
+
+Al seleccionar Calcular con un formulario válido, el frontend calcula y muestra la cuota mensual fija, el total de intereses y el total a pagar mediante el sistema de amortización francesa. Los resultados se formatean como pesos colombianos con la configuración regional `es-CO`.
+
+Este cálculo se replica en el frontend exclusivamente para ofrecer retroalimentación inmediata al usuario. El cálculo autoritativo y persistido continúa siendo responsabilidad de `AmortizationService` en el backend cuando se implemente el guardado de la simulación en la Fase 13. En esta fase no se realizan llamadas HTTP ni se incluye un botón para guardar.
+
+### Fase 12: tabla de amortización local
+
+El formulario de simulación ahora genera en el frontend una tabla de amortización francesa después de calcular una simulación válida. La tabla contiene una fila por cada período del plazo e incluye las columnas de cuota, abono a capital, interés del mes, valor de la cuota y saldo pendiente.
+
+Los valores monetarios de cada período se redondean a dos decimales durante el cálculo para reducir el arrastre de precisión propio de los números de punto flotante en JavaScript. La tabla utiliza Angular Material y presenta los valores en pesos colombianos. Esta funcionalidad continúa siendo solo una visualización local y no realiza llamadas HTTP ni guarda información en el backend.
