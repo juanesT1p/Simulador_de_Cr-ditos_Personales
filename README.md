@@ -107,3 +107,9 @@ Este cálculo se replica en el frontend exclusivamente para ofrecer retroaliment
 El formulario de simulación ahora genera en el frontend una tabla de amortización francesa después de calcular una simulación válida. La tabla contiene una fila por cada período del plazo e incluye las columnas de cuota, abono a capital, interés del mes, valor de la cuota y saldo pendiente.
 
 Los valores monetarios de cada período se redondean a dos decimales durante el cálculo para reducir el arrastre de precisión propio de los números de punto flotante en JavaScript. La tabla utiliza Angular Material y presenta los valores en pesos colombianos. Esta funcionalidad continúa siendo solo una visualización local y no realiza llamadas HTTP ni guarda información en el backend.
+
+### Fase 13: persistencia de simulaciones desde el formulario
+
+El formulario de simulación se conectó con el backend mediante `SimulationService`. Después de calcular una simulación válida, el usuario puede guardarla a través del endpoint `POST /api/simulations`. La solicitud envía los valores ingresados en el formulario y la respuesta del backend, que incluye el identificador y la fecha de creación, se conserva para mostrar una confirmación adicional en pantalla.
+
+Durante el guardado se deshabilita el botón para evitar envíos duplicados. Los resultados exitosos y los errores se comunican mediante `MatSnackBar`. Para respuestas `400 Bad Request`, se muestran los mensajes de validación devueltos por el backend; los demás errores muestran un mensaje genérico sin exponer detalles técnicos al usuario.
