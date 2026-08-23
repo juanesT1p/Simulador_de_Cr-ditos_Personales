@@ -3,6 +3,9 @@ export interface SimulationRequest {
   loanAmount: number;
   interestRate: number;
   termMonths: number;
+  monthlyPayment: number;
+  totalInterest: number;
+  totalPayment: number;
 }
 
 export interface Simulation {

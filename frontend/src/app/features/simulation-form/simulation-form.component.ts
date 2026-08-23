@@ -79,36 +79,49 @@ export class SimulationFormComponent {
 
     const monthlyRate = Math.pow(1 + interestRate / 100, 1 / 12) - 1;
     const rateFactor = Math.pow(1 + monthlyRate, termMonths);
-    const monthlyPayment = loanAmount * ((monthlyRate * rateFactor) / (rateFactor - 1));
-    const totalPayment = monthlyPayment * termMonths;
-
-    this.summary = {
-      monthlyPayment,
-      totalInterest: totalPayment - loanAmount,
-      totalPayment,
-    };
-    this.savedSimulation = null;
+    const monthlyPayment = this.roundCurrency(
+      monthlyRate === 0
+        ? loanAmount / termMonths
+        : loanAmount * ((monthlyRate * rateFactor) / (rateFactor - 1)),
+    );
 
     let remainingBalance = this.roundCurrency(loanAmount);
+    let totalInterest = 0;
     this.amortizationRows = [];
 
     for (let period = 1; period <= termMonths; period++) {
       const interestPayment = this.roundCurrency(remainingBalance * monthlyRate);
-      const capitalPayment = this.roundCurrency(monthlyPayment - interestPayment);
-      remainingBalance = this.roundCurrency(remainingBalance - capitalPayment);
+      let capitalPayment: number;
+      let installment: number;
 
-      if (Math.abs(remainingBalance) <= 0.01) {
+      if (period === termMonths) {
+        capitalPayment = remainingBalance;
+        installment = this.roundCurrency(capitalPayment + interestPayment);
         remainingBalance = 0;
+      } else {
+        installment = monthlyPayment;
+        capitalPayment = this.roundCurrency(installment - interestPayment);
+        remainingBalance = this.roundCurrency(remainingBalance - capitalPayment);
       }
+
+      totalInterest = this.roundCurrency(totalInterest + interestPayment);
 
       this.amortizationRows.push({
         period,
         capitalPayment,
         interestPayment,
-        installment: this.roundCurrency(monthlyPayment),
+        installment,
         remainingBalance,
       });
     }
+
+    const totalPayment = this.roundCurrency(loanAmount + totalInterest);
+    this.summary = {
+      monthlyPayment,
+      totalInterest,
+      totalPayment,
+    };
+    this.savedSimulation = null;
   }
 
   saveSimulation(): void {
@@ -121,7 +134,15 @@ export class SimulationFormComponent {
       return;
     }
 
-    const request: SimulationRequest = { clientName, loanAmount, interestRate, termMonths };
+    const request: SimulationRequest = {
+      clientName,
+      loanAmount,
+      interestRate,
+      termMonths,
+      monthlyPayment: this.summary.monthlyPayment,
+      totalInterest: this.summary.totalInterest,
+      totalPayment: this.summary.totalPayment,
+    };
     this.isSaving = true;
 
     this.simulationService.createSimulation(request).subscribe({
