@@ -166,7 +166,9 @@ spring:
       ddl-auto: update
 ```
 
-El usuario y la contraseña pueden reemplazarse mediante `DB_USER` y `DB_PASSWORD`. Hibernate utiliza `ddl-auto: update` para crear o actualizar la tabla `simulations` automáticamente durante el desarrollo. No se requiere un script SQL manual.
+El usuario y la contraseña pueden reemplazarse mediante `DB_USER` y `DB_PASSWORD`. Hibernate utiliza `ddl-auto: update` para crear o actualizar la tabla `simulations` automáticamente durante el desarrollo.
+
+El archivo `backend/src/main/resources/schema.sql` existe como script SQL documental de referencia para la tabla `simulations`; no se ejecuta automáticamente, ya que `ddl-auto: update` continúa gestionando el esquema.
 
 Como alternativa, la misma configuración puede expresarse en `application.properties`:
 
@@ -251,9 +253,15 @@ Content-Type: application/json
   "clientName": "Juan Pérez",
   "loanAmount": 20000000,
   "interestRate": 18.0,
-  "termMonths": 36
+  "termMonths": 36,
+  "monthlyPayment": 709735.61,
+  "totalInterest": 5550482.06,
+  "totalPayment": 25550482.06
 }
 ```
+
+`monthlyPayment`, `totalInterest` y `totalPayment` forman parte del contrato de entrada, pero el backend los recalcula con `AmortizationService` antes de persistir.
+La aplicación no confía en los valores recibidos desde el cliente para guardar la simulación.
 
 Response `201 Created`:
 
@@ -394,6 +402,7 @@ Por último se desarrolló la vista de histórico con Angular Material. La vista
 | 15 | Enrutamiento, navegación y navbar reutilizable. | Completa |
 | 16 | Pulido visual de la interfaz con Angular Material. | Completa |
 | 17 | Consolidación del README como documentación final. | Completa |
+| 18 | Revisión final contra la rúbrica y corrección de hallazgos (redondeo del último periodo, contrato de solicitud completo, script SQL documental). | Completa |
 
 ## Objetivos
 
@@ -404,4 +413,4 @@ Por último se desarrolló la vista de histórico con Angular Material. La vista
 
 ## Estado actual
 
-Las Fases 0 a 17 están completas. El proyecto está funcionalmente completo: el backend calcula y persiste simulaciones en PostgreSQL, el frontend consume la API y presenta el formulario, el plan de amortización y el histórico, y la interfaz cuenta con navegación, filtros y diseño responsive basado en Angular Material.
+Las Fases 0 a 18 están completas. El proyecto está funcionalmente completo: el backend calcula y persiste simulaciones en PostgreSQL, el frontend consume la API y presenta el formulario, el plan de amortización y el histórico, y la interfaz cuenta con navegación, filtros y diseño responsive basado en Angular Material.
