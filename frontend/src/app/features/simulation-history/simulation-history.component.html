@@ -1,0 +1,82 @@
+<section class="simulation-history-page">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Histórico de simulaciones</mat-card-title>
+      <mat-card-subtitle>Consulte las simulaciones guardadas y aplique filtros opcionales.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="filters">
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar por nombre de cliente</mat-label>
+          <input matInput [formControl]="clientNameControl" (keyup.enter)="searchByClientName()" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha inicial</mat-label>
+          <input matInput [matDatepicker]="startPicker" [formControl]="startDateControl" (dateChange)="searchByDateRange()" />
+          <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha final</mat-label>
+          <input matInput [matDatepicker]="endPicker" [formControl]="endDateControl" (dateChange)="searchByDateRange()" />
+          <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <div class="filter-actions">
+          <button mat-stroked-button type="button" (click)="searchByClientName()">Buscar</button>
+          <button mat-stroked-button type="button" (click)="clearFilters()">Limpiar filtros</button>
+        </div>
+      </div>
+
+      @if (isLoading) {
+        <div class="loading-state">
+          <mat-spinner diameter="36"></mat-spinner>
+          <span>Cargando...</span>
+        </div>
+      } @else if (simulations.length === 0) {
+        <p class="empty-state">No hay simulaciones registradas.</p>
+      } @else {
+        <div class="history-table-container">
+          <table mat-table [dataSource]="simulations" class="history-table">
+            <ng-container matColumnDef="createdAt">
+              <th mat-header-cell *matHeaderCellDef>Fecha de Registro</th>
+              <td mat-cell *matCellDef="let simulation">{{ simulation.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="clientName">
+              <th mat-header-cell *matHeaderCellDef>Nombre Cliente</th>
+              <td mat-cell *matCellDef="let simulation">{{ simulation.clientName }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="loanAmount">
+              <th mat-header-cell *matHeaderCellDef>Monto Solicitado</th>
+              <td mat-cell *matCellDef="let simulation">{{ simulation.loanAmount | currency:'COP':'symbol-narrow':'1.2-2' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="termMonths">
+              <th mat-header-cell *matHeaderCellDef>Plazo en Meses</th>
+              <td mat-cell *matCellDef="let simulation">{{ simulation.termMonths }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="interestRate">
+              <th mat-header-cell *matHeaderCellDef>Tasa EA %</th>
+              <td mat-cell *matCellDef="let simulation">{{ simulation.interestRate | number:'1.2-2' }} %</td>
+            </ng-container>
+
+            <ng-container matColumnDef="monthlyPayment">
+              <th mat-header-cell *matHeaderCellDef>Cuota Mensual Calculada</th>
+              <td mat-cell *matCellDef="let simulation">{{ simulation.monthlyPayment | currency:'COP':'symbol-narrow':'1.2-2' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>

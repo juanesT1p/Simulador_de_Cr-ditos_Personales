@@ -1,0 +1,46 @@
+.simulation-history-page {
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 0 16px 32px;
+}
+
+mat-card-content {
+  padding-top: 24px;
+}
+
+.filters {
+  display: grid;
+  gap: 8px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.loading-state {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  min-height: 160px;
+}
+
+.empty-state {
+  margin: 32px 0 0;
+  text-align: center;
+}
+
+.history-table-container {
+  margin-top: 24px;
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+}
