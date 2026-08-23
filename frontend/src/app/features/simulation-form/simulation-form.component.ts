@@ -5,11 +5,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
 
 interface SimulationSummary {
   monthlyPayment: number;
   totalInterest: number;
   totalPayment: number;
+}
+
+interface AmortizationRow {
+  period: number;
+  capitalPayment: number;
+  interestPayment: number;
+  installment: number;
+  remainingBalance: number;
 }
 
 @Component({
@@ -21,6 +30,7 @@ interface SimulationSummary {
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatTableModule,
     CurrencyPipe,
   ],
   templateUrl: './simulation-form.component.html',
@@ -30,13 +40,16 @@ export class SimulationFormComponent {
   private readonly formBuilder = inject(FormBuilder);
 
   readonly simulationForm = this.formBuilder.group({
-    clientName: ['', Validators.required],
+    clientName: ['', [Validators.required, Validators.pattern(/^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$/)]],
     loanAmount: [null, [Validators.required, Validators.min(1)]],
     interestRate: [null, [Validators.required, Validators.min(0.01)]],
     termMonths: [null, [Validators.required, Validators.min(1)]],
   });
 
   summary: SimulationSummary | null = null;
+  amortizationRows: AmortizationRow[] = [];
+  readonly displayedColumns = ['period', 'capitalPayment', 'interestPayment', 'installment', 'remainingBalance'];
+
   calculate(): void {
     if (this.simulationForm.invalid) {
       this.simulationForm.markAllAsTouched();
@@ -58,5 +71,30 @@ export class SimulationFormComponent {
       totalInterest: totalPayment - loanAmount,
       totalPayment,
     };
+
+    let remainingBalance = this.roundCurrency(loanAmount);
+    this.amortizationRows = [];
+
+    for (let period = 1; period <= termMonths; period++) {
+      const interestPayment = this.roundCurrency(remainingBalance * monthlyRate);
+      const capitalPayment = this.roundCurrency(monthlyPayment - interestPayment);
+      remainingBalance = this.roundCurrency(remainingBalance - capitalPayment);
+
+      if (Math.abs(remainingBalance) <= 0.01) {
+        remainingBalance = 0;
+      }
+
+      this.amortizationRows.push({
+        period,
+        capitalPayment,
+        interestPayment,
+        installment: this.roundCurrency(monthlyPayment),
+        remainingBalance,
+      });
+    }
+  }
+
+  private roundCurrency(value: number): number {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
   }
 }

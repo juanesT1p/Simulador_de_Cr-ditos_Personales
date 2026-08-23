@@ -1,0 +1,46 @@
+.simulation-form-page {
+  margin: 0 auto;
+  max-width: 720px;
+  padding: 32px 16px;
+}
+
+mat-card-content {
+  padding-top: 24px;
+}
+
+form {
+  display: grid;
+  gap: 8px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.summary {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  margin-top: 32px;
+  padding-top: 24px;
+}
+
+.summary h2 {
+  margin-top: 0;
+}
+
+.summary p {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.amortization-table-section {
+  margin-top: 32px;
+}
+
+.amortization-table-container {
+  overflow-x: auto;
+}
+
+.amortization-table {
+  width: 100%;
+}

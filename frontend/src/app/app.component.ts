@@ -1,17 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { SimulationFormComponent } from './features/simulation-form/simulation-form.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [SimulationFormComponent],
   template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    <router-outlet />
+    <app-simulation-form />
   `,
   styles: [],
 })
 export class AppComponent {
-  title = 'frontend';
 }
