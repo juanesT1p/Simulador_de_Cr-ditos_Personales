@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-import { SimulationFormComponent } from './features/simulation-form/simulation-form.component';
-import { SimulationHistoryComponent } from './features/simulation-history/simulation-history.component';
+import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [SimulationFormComponent, SimulationHistoryComponent],
+  imports: [NavbarComponent, RouterOutlet],
   template: `
-    <app-simulation-form />
-    <app-simulation-history />
+    <app-navbar />
+    <router-outlet />
   `,
   styles: [],
 })

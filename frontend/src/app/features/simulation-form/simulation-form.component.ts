@@ -10,6 +10,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 
 import { Simulation, SimulationRequest, ValidationErrorResponse } from '../../core/models/simulation.model';
+import { SimulationRefreshService } from '../../core/services/simulation-refresh.service';
 import { SimulationService } from '../../core/services/simulation.service';
 
 interface SimulationSummary {
@@ -47,6 +48,7 @@ export class SimulationFormComponent {
   private readonly formBuilder = inject(FormBuilder);
 
   constructor(
+    private readonly simulationRefreshService: SimulationRefreshService,
     private readonly simulationService: SimulationService,
     private readonly snackBar: MatSnackBar,
   ) {}
@@ -126,6 +128,7 @@ export class SimulationFormComponent {
       next: (simulation) => {
         this.savedSimulation = simulation;
         this.isSaving = false;
+        this.simulationRefreshService.requestRefresh();
         this.snackBar.open('Simulación guardada correctamente.', 'Cerrar', { duration: 4000 });
       },
       error: (error: HttpErrorResponse) => {

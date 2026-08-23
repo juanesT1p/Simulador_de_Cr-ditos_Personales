@@ -1,0 +1,32 @@
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 0 clamp(12px, 4vw, 40px);
+  box-shadow: var(--mat-app-elevation-shadow-level-2, 0 3px 8px rgba(0, 0, 0, 0.12));
+}
+
+mat-toolbar a {
+  min-width: 0;
+  border-radius: 6px;
+}
+
+.active-link {
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: inset 0 -2px currentColor;
+}
+
+@media (max-width: 420px) {
+  mat-toolbar {
+    gap: 0;
+    padding: 0 8px;
+  }
+
+  mat-toolbar a {
+    flex: 1;
+    font-size: 0.875rem;
+  }
+}

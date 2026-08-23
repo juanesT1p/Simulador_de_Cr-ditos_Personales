@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, Observable } from 'rxjs';
 
 import { Simulation } from '../../core/models/simulation.model';
+import { SimulationRefreshService } from '../../core/services/simulation-refresh.service';
 import { SimulationService } from '../../core/services/simulation.service';
 
 @Component({
@@ -49,16 +50,25 @@ export class SimulationHistoryComponent implements OnInit {
   isLoading = false;
 
   constructor(
+    private readonly simulationRefreshService: SimulationRefreshService,
     private readonly simulationService: SimulationService,
     private readonly snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
-    this.loadSimulations(this.simulationService.getAllSimulations());
+    this.refreshHistory();
+
+    this.simulationRefreshService.refreshRequested$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshHistory());
 
     this.clientNameControl.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.searchByClientName());
+  }
+
+  refreshHistory(): void {
+    this.loadSimulations(this.simulationService.getAllSimulations());
   }
 
   searchByClientName(): void {

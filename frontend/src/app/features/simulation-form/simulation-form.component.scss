@@ -1,7 +1,12 @@
 .simulation-form-page {
   margin: 0 auto;
   max-width: 720px;
-  padding: 32px 16px;
+  padding: 32px 16px 48px;
+}
+
+mat-card {
+  border: 1px solid var(--mat-table-row-item-outline-color, #e2e2e6);
+  box-shadow: var(--mat-app-elevation-shadow-level-2, 0 3px 8px rgba(0, 0, 0, 0.12));
 }
 
 mat-card-content {
@@ -10,17 +15,30 @@ mat-card-content {
 
 form {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 12px;
 }
 
 mat-form-field {
   width: 100%;
 }
 
+form > mat-form-field:first-child,
+form > button {
+  grid-column: 1 / -1;
+}
+
+.summary,
+.amortization-table-section {
+  border-top: 1px solid var(--mat-table-row-item-outline-color, #e2e2e6);
+}
+
 .summary {
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
   margin-top: 32px;
-  padding-top: 24px;
+  padding: 24px 20px 16px;
+  background-color: var(--mdc-elevated-card-container-color, #ffffff);
+  border-radius: 12px;
 }
 
 .summary h2 {
@@ -31,10 +49,31 @@ mat-form-field {
   display: flex;
   justify-content: space-between;
   gap: 16px;
+  margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--mat-table-row-item-outline-color, #e2e2e6);
+}
+
+.summary p:last-child {
+  border-bottom: 0;
+}
+
+.summary strong {
+  color: var(--mdc-text-button-label-text-color, #343dff);
+  text-align: right;
+}
+
+.summary + button {
+  margin-top: 20px;
 }
 
 .amortization-table-section {
-  margin-top: 32px;
+  margin-top: 36px;
+  padding-top: 24px;
+}
+
+.amortization-table-section h2 {
+  margin-top: 0;
 }
 
 .save-confirmation {
@@ -47,4 +86,55 @@ mat-form-field {
 
 .amortization-table {
   width: 100%;
+}
+
+.amortization-table .mat-mdc-header-cell,
+.amortization-table .mat-mdc-cell {
+  padding: 14px 16px;
+}
+
+.amortization-table .mat-mdc-header-cell {
+  background-color: var(--mat-table-background-color, #faf9fd);
+  font-weight: 700;
+}
+
+.amortization-table .mat-column-period {
+  text-align: center;
+}
+
+.amortization-table .mat-column-capitalPayment,
+.amortization-table .mat-column-interestPayment,
+.amortization-table .mat-column-installment,
+.amortization-table .mat-column-remainingBalance {
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .simulation-form-page {
+    padding: 20px 12px 32px;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  form > mat-form-field:first-child,
+  form > button {
+    grid-column: auto;
+  }
+
+  .summary {
+    padding: 20px 16px 12px;
+  }
+
+  .summary p {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .summary strong {
+    text-align: left;
+  }
 }
