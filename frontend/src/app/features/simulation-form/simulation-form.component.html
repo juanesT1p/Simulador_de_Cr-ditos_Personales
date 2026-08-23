@@ -55,6 +55,16 @@
           <p><span>Total a pagar</span><strong>{{ result.totalPayment | currency:'COP':'symbol-narrow':'1.2-2' }}</strong></p>
         </section>
 
+        <button mat-flat-button color="primary" type="button" [disabled]="isSaving" (click)="saveSimulation()">
+          {{ isSaving ? 'Guardando...' : 'Guardar simulación' }}
+        </button>
+
+        @if (savedSimulation; as simulation) {
+          <p class="save-confirmation">
+            Simulación guardada con ID {{ simulation.id }} el {{ simulation.createdAt | date:'medium' }}.
+          </p>
+        }
+
         <section class="amortization-table-section">
           <h2>Tabla de amortización</h2>
           <div class="amortization-table-container">
