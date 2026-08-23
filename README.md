@@ -113,3 +113,11 @@ Los valores monetarios de cada período se redondean a dos decimales durante el 
 El formulario de simulación se conectó con el backend mediante `SimulationService`. Después de calcular una simulación válida, el usuario puede guardarla a través del endpoint `POST /api/simulations`. La solicitud envía los valores ingresados en el formulario y la respuesta del backend, que incluye el identificador y la fecha de creación, se conserva para mostrar una confirmación adicional en pantalla.
 
 Durante el guardado se deshabilita el botón para evitar envíos duplicados. Los resultados exitosos y los errores se comunican mediante `MatSnackBar`. Para respuestas `400 Bad Request`, se muestran los mensajes de validación devueltos por el backend; los demás errores muestran un mensaje genérico sin exponer detalles técnicos al usuario.
+
+### Fase 14: histórico de simulaciones y filtros
+
+Se creó una vista de histórico que consulta y muestra las simulaciones guardadas en una tabla de Angular Material. La tabla presenta la fecha de registro, el nombre del cliente, el monto solicitado, el plazo en meses, la tasa efectiva anual y la cuota mensual calculada, con fechas y valores monetarios formateados para la interfaz.
+
+Al inicializarse, la vista consulta el histórico completo mediante `GET /api/simulations`. También permite buscar por nombre de cliente mediante el parámetro `clientName`, con espera breve al escribir, y filtrar por rango de fechas usando los parámetros `startDate` y `endDate` en formato ISO 8601. El botón de limpieza restablece los filtros y vuelve a consultar el histórico completo.
+
+La vista informa el estado de carga, la ausencia de registros y los errores de consulta. Los errores se muestran con `MatSnackBar` mediante mensajes seguros para el usuario, sin exponer detalles técnicos.
