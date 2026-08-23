@@ -63,3 +63,31 @@ Al iniciar la aplicación con `mvn spring-boot:run` se presentó el error `FATAL
 Tras resolver ambas incidencias, se verificó manualmente el funcionamiento de los endpoints REST de la Fase 6. `POST /api/simulations` creó simulaciones y devolvió `201 Created` con los valores calculados `monthlyPayment`, `totalInterest` y `totalPayment`. `GET /api/simulations` devolvió `200 OK` con las simulaciones guardadas y `GET /api/simulations?clientName=...` filtró correctamente por nombre de cliente. La persistencia se confirmó consultando directamente la tabla `simulations` en PostgreSQL con `psql`.
 
 Como nota pendiente, las solicitudes con datos inválidos, como un `loanAmount` negativo o un `clientName` vacío, actualmente devuelven un error `500` sin formato estructurado. Esta respuesta se resolverá en la Fase 7 mediante el manejo centralizado de excepciones con `@ControllerAdvice`.
+
+### Fase 7: manejo de errores y CORS
+
+Se creó `GlobalExceptionHandler` como manejo centralizado de excepciones mediante `@RestControllerAdvice`. Los errores de validación de solicitudes devuelven `400 Bad Request`, mientras que los errores no controlados devuelven `500 Internal Server Error` sin exponer detalles internos al cliente. También queda preparada la excepción `SimulationNotFoundException` para respuestas futuras de `404 Not Found`.
+
+Las respuestas de error utilizan un cuerpo JSON estructurado con los campos `timestamp`, `status`, `error` y `message`. En el caso de errores de validación, se incluye adicionalmente un mapa de errores que relaciona cada campo con su mensaje de validación.
+
+Se configuró CORS de forma centralizada para las rutas `/api/**`, permitiendo solicitudes desde `http://localhost:4200`. La configuración admite los métodos `GET`, `POST`, `PUT`, `DELETE` y `OPTIONS`, así como todos los encabezados requeridos por el frontend.
+
+### Fase 8: prueba manual de endpoints REST
+
+Se verificó manualmente el backend con el servidor local iniciado mediante `mvn spring-boot:run` y PostgreSQL activo. Una solicitud `POST /api/simulations` con `clientName` igual a `Juan Pérez`, `loanAmount` de `20000000`, `interestRate` de `18.0` y `termMonths` de `36` devolvió `201 Created`. La respuesta incluyó `monthlyPayment` con valor `709735.61`, `totalInterest` con valor `5550482.06`, `totalPayment` con valor `25550482.06`, además de los valores `id` y `createdAt` generados automáticamente.
+
+También se validaron los escenarios de error. Un `POST /api/simulations` con `clientName` vacío y `loanAmount` negativo devolvió `400 Bad Request` con un cuerpo estructurado que incluye `validationErrors`, detallando el campo y el mensaje de cada violación. Una solicitud con cuerpo no JSON o malformado devolvió `400 Bad Request` con un mensaje genérico de formato inválido, sin exponer el stacktrace interno.
+
+La consulta `GET /api/simulations` devolvió `200 OK` con la lista de simulaciones persistidas. La consulta `GET /api/simulations?clientName=...` devolvió `200 OK` con los resultados filtrados correctamente mediante coincidencia parcial e ignorando mayúsculas y minúsculas.
+
+Se comprobó el preflight CORS mediante una solicitud `OPTIONS` desde el origen `http://localhost:4200`. La respuesta devolvió `200 OK` e incluyó los encabezados `Access-Control-Allow-Origin` y `Access-Control-Allow-Methods`, confirmando que el frontend Angular puede consumir la API sin bloqueos de CORS.
+
+Como verificación adicional, los datos persistidos se confirmaron directamente en PostgreSQL mediante una consulta SQL a la tabla `simulations`. Todos los endpoints del backend quedaron validados manualmente y el backend está listo para ser consumido por el frontend Angular en las fases siguientes.
+
+### Fase 10: modelos y servicio HTTP del frontend
+
+Se crearon las interfaces TypeScript `SimulationRequest`, `Simulation` y `ValidationErrorResponse` dentro de `frontend/src/app/core/models`. Estas interfaces tipan los datos enviados y recibidos por la API, incluidos los valores calculados de una simulación y el cuerpo estructurado de los errores de validación.
+
+Se creó `SimulationService` en `frontend/src/app/core/services` para centralizar el consumo HTTP de simulaciones. El servicio expone `createSimulation`, que corresponde a `POST /api/simulations`; `getAllSimulations`, que corresponde a `GET /api/simulations`; `searchByClientName`, que envía el parámetro `clientName`; y `searchByDateRange`, que envía los parámetros `startDate` y `endDate` al endpoint de consulta.
+
+La configuración standalone de Angular registra `provideHttpClient()` en `app.config.ts` para habilitar `HttpClient` en los servicios de la aplicación. La URL base de la API se mantiene en el servicio y queda preparada para trasladarse a una configuración de entornos cuando el proyecto la incorpore.
